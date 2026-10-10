@@ -234,6 +234,7 @@ import torch
 def softmax_attention_weights(masked_scores):
     # TODO: softmax over the last axis, zeroing rows that are entirely -inf
     softmax_scores = torch.nn.functional.softmax(masked_scores, dim=-1)  #over the final axis
+    # Handle the masked out all_row(float('-inf')) scores -> since softmax becomes (0/0)
     softmax_scores[masked_scores == float('-inf')] = 0.0
     return softmax_scores
     pass
