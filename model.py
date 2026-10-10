@@ -174,8 +174,22 @@ def build_padding_mask(token_ids, pad_id):
     return pad_mask_tensor
     pass
 
-# Step 15 - build_causal_mask (not yet solved)
-# TODO: implement
+# Step 15 - build_causal_mask
+import torch
+
+def build_causal_mask(seq_len):
+    """Return a (1, 1, seq_len, seq_len) bool mask, True on and below diagonal."""
+    # TODO: build a lower-triangular boolean causal mask of shape (1, 1, seq_len, seq_len)
+    row_vec_index = torch.arange(seq_len)
+    row_vec_index = row_vec_index.repeat(seq_len,1)    
+    col_vec_index = row_vec_index.t()
+
+    row_vec_index = row_vec_index[:,:,None,None].permute(2,3,0,1)
+    col_vec_index = col_vec_index[:,:,None,None].permute(2,3,0,1)
+
+    return row_vec_index <= col_vec_index
+
+    pass
 
 # Step 16 - combine_padding_and_causal_masks (not yet solved)
 # TODO: implement
