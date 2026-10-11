@@ -384,7 +384,7 @@ def compute_layer_norm_mean_and_variance(x):
     # TODO: return (mean, variance) reduced over the last dim with shape (..., 1)
     D = x.shape[-1]
     mean = x.sum(dim=-1, keepdim=True) / D
-    var = torch.sum((x-mean) ** 2,dim=-1,keepdim=True) / D
+    var = torch.sum((x-mean) ** 2,dim=-1, keepdim=True) / D
     return mean, var
     pass
 
