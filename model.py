@@ -474,8 +474,26 @@ def decoder_layer_masked_self_attention_sublayer(y, w_q, w_k, w_v, w_o, gamma, b
     return apply_residual_add_and_norm(y, sublayer_output, gamma, beta)
     pass
 
-# Step 44 - decoder_layer_cross_attention_sublayer (not yet solved)
-# TODO: implement
+# Step 44 - decoder_layer_cross_attention_sublayer
+import torch
+
+def decoder_layer_cross_attention_sublayer(y, encoder_output, w_q, w_k, w_v, w_o, gamma, beta, num_heads, src_mask):
+    # TODO: run multi-head cross-attention (Q from y, K/V from encoder_output) and wrap with add-and-norm
+    Q = apply_linear_projection(y, w_q, None)
+    K = apply_linear_projection(encoder_output, w_k, None)
+    V = apply_linear_projection(encoder_output, w_v, None)
+
+    q_h, k_h, v_h = split_qkv_into_heads(Q, K, V, num_heads)
+
+    if src_mask is not None and len(src_mask.shape) == 2:
+        src_mask = src_mask[:,:,None,None].permute((0,2,3,1))
+
+    context_h, _ = scaled_dot_product_attention(q_h, k_h, v_h, src_mask)
+    cross_context = merge_heads_and_project_output(context_h, w_o, None)
+
+    return apply_residual_add_and_norm(y, cross_context, gamma, beta)
+
+    pass
 
 # Step 45 - decoder_layer_feed_forward_sublayer (not yet solved)
 # TODO: implement
