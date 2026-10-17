@@ -585,6 +585,7 @@ def apply_log_softmax_over_vocab(logits):
     exp_arg = logits - z_max # numerically stable
     exp_val = torch.exp(exp_arg)
     return exp_arg - torch.log(exp_val.sum(axis=2,keepdims=True))
+    # return torch.nn.LogSoftmax(exp_arg,dim=2)
     pass
 
 # Step 51 - run_transformer_forward (not yet solved)
