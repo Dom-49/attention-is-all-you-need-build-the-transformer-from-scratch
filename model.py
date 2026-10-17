@@ -578,8 +578,14 @@ def tie_output_projection_to_token_embeddings(token_embedding_weight):
     return token_embedding_weight.t() # this transpose keeps the memory embedding
     pass
 
-# Step 50 - apply_log_softmax_over_vocab (not yet solved)
-# TODO: implement
+# Step 50 - apply_log_softmax_over_vocab
+def apply_log_softmax_over_vocab(logits):
+    # TODO: Convert decoder logits (B, T, V) into log probabilities over the vocabulary axis.
+    z_max = torch.amax(logits,axis=2,keepdim=True)
+    exp_arg = logits - z_max # numerically stable
+    exp_val = torch.exp(exp_arg)
+    return exp_arg - torch.log(exp_val.sum(axis=2,keepdims=True))
+    pass
 
 # Step 51 - run_transformer_forward (not yet solved)
 # TODO: implement
