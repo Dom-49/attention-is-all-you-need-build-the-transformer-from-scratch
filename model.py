@@ -588,8 +588,47 @@ def apply_log_softmax_over_vocab(logits):
     # return torch.nn.LogSoftmax(exp_arg,dim=2)
     pass
 
-# Step 51 - run_transformer_forward (not yet solved)
-# TODO: implement
+# Step 51 - run_transformer_forward
+def run_transformer_forward(src_ids, tgt_ids, model_params, num_heads, pad_id):
+    # TODO: embed src+tgt, add PE, build masks, run encoder/decoder, project to log probs.
+    B, S = src_ids.shape
+    _, T = tgt_ids.shape
+    max_len = max(S,T)
+
+    emb = model_params['token_embedding']
+    V, D = emb.shape
+    src_embed = torch.zeros((B, S, D),dtype=torch.float) # embedded vector representation
+    tgt_embed = torch.zeros((B, T, D),dtype=torch.float)
+
+    # Embed the source
+    for i in range(B):
+        src_embed[i,...] = emb[src_ids[i,...],...]
+        tgt_embed[i,...] = emb[tgt_ids[i,...],...]
+
+    # scaling
+    src_scaled = scale_embeddings_by_sqrt_d_model(src_embed, D)
+    tgt_scaled = scale_embeddings_by_sqrt_d_model(tgt_embed, D)    
+
+    # Positional encode the source
+    pos_encoding = build_sinusoidal_positional_encoding(max_len, D)
+
+    x_src = add_positional_encoding_to_embeddings(src_scaled, pos_encoding)
+    y_tgt = add_positional_encoding_to_embeddings(tgt_scaled, pos_encoding)
+
+    src_pad_mask = build_padding_mask(src_ids, pad_id)
+    tgt_pad_mask = build_padding_mask(tgt_ids, pad_id)    
+
+    # Encoder forward pass
+    out_encoder = stack_encoder_layers(x_src, model_params['encoder_layers'], num_heads, src_pad_mask)
+
+    # Decoder Pass
+    y_hat = stack_decoder_layers(y_tgt, out_encoder, model_params['decoder_layers'], num_heads, src_pad_mask, tgt_pad_mask)
+
+    # Project embedding to vocabulary dimension
+    logits = y_hat @  model_params['output_projection'].t()
+
+    return apply_log_softmax_over_vocab(logits)    
+    pass
 
 # Step 52 - init_encoder_layer_parameters (not yet solved)
 # TODO: implement
