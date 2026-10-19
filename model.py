@@ -661,8 +661,43 @@ def init_encoder_layer_parameters(d_model, num_heads, d_ff):
     return layer_params
     pass
 
-# Step 53 - init_decoder_layer_parameters (not yet solved)
-# TODO: implement
+# Step 53 - init_decoder_layer_parameters
+import torch
+
+def init_decoder_layer_parameters(d_model, num_heads, d_ff):
+    # TODO: return a dict of requires_grad tensors for one decoder layer
+    layer_params = dict()        
+    init_std = 0.2
+
+    # Self attention params
+    layer_params['w_q_self'] = torch.normal(mean=0.0, std=init_std, size=(d_model, d_model), dtype=torch.float32, requires_grad=True)
+    layer_params['w_k_self'] = torch.normal(mean=0.0, std=init_std, size=(d_model, d_model), dtype=torch.float32, requires_grad=True)
+    layer_params['w_v_self'] = torch.normal(mean=0.0, std=init_std, size=(d_model, d_model), dtype=torch.float32, requires_grad=True)
+    layer_params['w_o_self'] = torch.normal(mean=0.0, std=init_std, size=(d_model, d_model), dtype=torch.float32, requires_grad=True)
+
+    layer_params['self_gamma'] = torch.ones((d_model,), dtype=torch.float32, requires_grad=True)
+    layer_params['self_beta'] = torch.zeros((d_model,), dtype=torch.float32, requires_grad=True)
+
+    # cross attention params
+    layer_params['w_q_cross'] = torch.normal(mean=0.0, std=init_std, size=(d_model, d_model), dtype=torch.float32, requires_grad=True)
+    layer_params['w_k_cross'] = torch.normal(mean=0.0, std=init_std, size=(d_model, d_model), dtype=torch.float32, requires_grad=True)
+    layer_params['w_v_cross'] = torch.normal(mean=0.0, std=init_std, size=(d_model, d_model), dtype=torch.float32, requires_grad=True)
+    layer_params['w_o_cross'] = torch.normal(mean=0.0, std=init_std, size=(d_model, d_model), dtype=torch.float32, requires_grad=True)
+
+    layer_params['cross_gamma'] = torch.ones((d_model,), dtype=torch.float32, requires_grad=True)
+    layer_params['cross_beta'] = torch.zeros((d_model,), dtype=torch.float32, requires_grad=True)
+
+    # Feed Forward Params
+    layer_params['w1'] = torch.normal(mean=0.0, std=init_std, size=(d_model, d_ff), dtype=torch.float32, requires_grad=True)
+    layer_params['b1'] = torch.zeros((d_ff,), dtype=torch.float32, requires_grad=True)
+    layer_params['w2'] = torch.normal(mean=0.0, std=init_std, size=(d_ff, d_model), dtype=torch.float32, requires_grad=True)
+    layer_params['b2'] = torch.zeros((d_model,), dtype=torch.float32, requires_grad=True)
+
+    layer_params['ffn_gamma'] = torch.ones((d_model,), dtype=torch.float32, requires_grad=True)
+    layer_params['ffn_beta'] = torch.zeros((d_model,), dtype=torch.float32, requires_grad=True)
+
+    return layer_params
+    pass
 
 # Step 54 - init_embedding_and_projection_parameters (not yet solved)
 # TODO: implement
