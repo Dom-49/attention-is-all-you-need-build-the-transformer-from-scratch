@@ -708,9 +708,9 @@ def init_embedding_and_projection_parameters(vocab_size, d_model, tie_weights=Tr
     embedding_params = dict()
     embedding_params['src_embedding'] = torch.randn((vocab_size,d_model), dtype=torch.float32, requires_grad=True)
     embedding_params['tgt_embedding'] = torch.randn((vocab_size,d_model), dtype=torch.float32, requires_grad=True)
-    if tie_weights:
+    if tie_weights:        
         embedding_params['output_projection'] = embedding_params['tgt_embedding']
-    else:
+    else:        
         embedding_params['output_projection'] = torch.randn((vocab_size,d_model), dtype=torch.float32, requires_grad=True)
     
     return embedding_params
