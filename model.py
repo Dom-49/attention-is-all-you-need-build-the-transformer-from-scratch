@@ -963,7 +963,7 @@ def run_training_step_with_backprop(src_batch, tgt_batch, parameter_list, model_
 
     # backward pass
     loss.backward() # populates .grad for the whole parameter list
-    learning_rate = compute_noam_learning_rate(optimizer_state['t']+1,config['d_model'],config['warmup_steps'])
+    learning_rate = compute_noam_learning_rate(step_number,config['d_model'],config['warmup_steps'])
     optimizer_state = apply_adam_step_to_all_parameters(parameter_list, optimizer_state, learning_rate)
     return loss.item()
     pass
