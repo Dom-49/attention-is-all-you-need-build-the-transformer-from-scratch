@@ -995,8 +995,11 @@ def pick_next_token_by_argmax(final_step_logits):
     return torch.argmax(final_step_logits,dim=-1) # dim=-1 to ensure it's over the vocabulary axis
     pass
 
-# Step 75 - compute_length_penalty (not yet solved)
-# TODO: implement
+# Step 75 - compute_length_penalty
+def compute_length_penalty(sequence_length, alpha):
+    # TODO: return the Google NMT length penalty for the given sequence_length and alpha.
+    return ((5 + sequence_length) / 6) ** alpha
+    pass
 
 # Step 76 - compute_candidate_scores (not yet solved)
 # TODO: implement
