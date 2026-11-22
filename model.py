@@ -235,7 +235,8 @@ def softmax_attention_weights(masked_scores):
     # TODO: softmax over the last axis, zeroing rows that are entirely -inf
     softmax_scores = torch.nn.functional.softmax(masked_scores, dim=-1)  #over the final axis
     # Handle the masked out all_row(float('-inf')) scores -> since softmax becomes (0/0)
-    softmax_scores[masked_scores == float('-inf')] = 0.0
+    # softmax_scores[masked_scores == float('-inf')] = 0.0 # Don't use this, inplace breaks the autograd graph
+    softmax_scores = softmax_scores.masked_fill(masked_scores == float('-inf'), 0.0)
     return softmax_scores
     pass
 
@@ -919,8 +920,32 @@ def zero_all_parameter_gradients(parameter_list):
         parameter_list[i].grad = None
     pass
 
-# Step 71 - compute_batch_training_loss (not yet solved)
-# TODO: implement
+# Step 71 - compute_batch_training_loss
+def compute_batch_training_loss(src_batch, tgt_batch, model_params, config):
+    """One teacher-forced forward pass -> label-smoothed KL loss averaged over non-pad tokens.
+
+    model_params (read only; the same dict run_transformer_forward takes):
+      src_embedding, tgt_embedding, output_projection, encoder_layers, decoder_layers
+    config keys:
+      pad_id, start_id, vocab_size, smoothing, num_heads
+    """
+    # TODO: shift targets right, run the forward pass, build smoothed targets, and average the KL loss over non-pad tokens.
+    # probs = run_transformer_forward(src_batch, tgt_batch, model_params, config['num_heads'], config['pad_id'])    
+    shifted_tgt = shift_targets_right_with_start_token(tgt_batch,config['start_id'])
+    torch.autograd.set_detect_anomaly(True)
+    probs = run_transformer_forward(src_batch, shifted_tgt, model_params, config['num_heads'], config['pad_id'])
+    V = probs.shape[-1]
+
+    # Smooth the target distribution    
+    smoothed_dist = build_uniform_smoothing_distribution(probs.shape, config['vocab_size'], config['smoothing'])
+    # They don't explain it explicitly, but it seems confidence = 1 - epsilon = 1 - config['smoothing']
+    confidence_dist = set_confidence_on_gold_tokens(smoothed_dist, tgt_batch, 1-config['smoothing'])
+    confidence_dist_padded = zero_pad_column_and_pad_token_rows(confidence_dist, tgt_batch, config['pad_id'])
+
+    loss_tot = compute_label_smoothed_kl_loss(probs, confidence_dist_padded)
+    loss = average_loss_over_non_pad_tokens(loss_tot, tgt_batch, config['pad_id'])
+    return loss
+    pass
 
 # Step 72 - run_training_step_with_backprop (not yet solved)
 # TODO: implement
