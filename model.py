@@ -1031,8 +1031,16 @@ def select_top_k_candidates(candidate_scores, k):
     return out
     pass
 
-# Step 78 - append_tokens_to_beam_sequences (not yet solved)
-# TODO: implement
+# Step 78 - append_tokens_to_beam_sequences
+import torch
+
+def append_tokens_to_beam_sequences(beam_sequences, beam_indices, token_ids):
+    # TODO: gather parent beam rows and append the new token ids as the last column
+    beam_rows = beam_sequences[beam_indices,...]
+    concat_sequences = torch.cat((beam_rows, token_ids.reshape(-1,1)),1)
+    return concat_sequences
+    
+    pass
 
 # Step 79 - mark_finished_beams (not yet solved)
 # TODO: implement
