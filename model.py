@@ -947,8 +947,26 @@ def compute_batch_training_loss(src_batch, tgt_batch, model_params, config):
     return loss
     pass
 
-# Step 72 - run_training_step_with_backprop (not yet solved)
-# TODO: implement
+# Step 72 - run_training_step_with_backprop
+import torch
+
+def run_training_step_with_backprop(src_batch, tgt_batch, parameter_list, model_params, optimizer_state, step_number, config):
+    """Run one training iteration: zero grads, forward, backward, Noam LR, Adam step.
+
+    Returns the scalar loss value for the step as a Python float.
+    """
+    # TODO: zero grads, compute loss, backward, look up Noam LR, apply Adam step
+    # Zero grads
+    zero_all_parameter_gradients(parameter_list)
+    # compute the loss
+    loss = compute_batch_training_loss(src_batch, tgt_batch, model_params, config)
+
+    # backward pass
+    loss.backward() # populates .grad for the whole parameter list
+    learning_rate = compute_noam_learning_rate(optimizer_state['t']+1,config['d_model'],config['warmup_steps'])
+    optimizer_state = apply_adam_step_to_all_parameters(parameter_list, optimizer_state, learning_rate)
+    return loss.item()
+    pass
 
 # Step 73 - run_training_loop_for_steps (not yet solved)
 # TODO: implement
